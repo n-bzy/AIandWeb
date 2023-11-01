@@ -1,9 +1,74 @@
 # %%
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlsplit
+import nltk
+from nltk.corpus import stopwords
+nltk.download('punkt')
 
-server = requests.get("https://vm009.rz.uos.de/crawl/index.html")
 
-def crawl():
-    print(server.text)
+def crawl(start_link):
+    # Initalize stack and visited list
+    stack = []
+    visited = []
+    index = {}
+    # Get first list of urls from the start link and append to list
+    server = requests.get(start_link, timeout=3)
+    soup = BeautifulSoup(server.text, 'html.parser')
+    stack = get_href(start_link, soup)
+    while stack:
+        url = stack.pop()
+        if url in visited:
+            continue
+        server = requests.get(url, timeout=3)
+        soup = BeautifulSoup(server.text, 'html.parser')
+        # Get the content and update index
+        content = get_content(soup)
+        update_index(url, index, content)
+        visited.append(url)
+        urls = get_href(url, soup)
+        for url in urls:
+            stack.append(url)
+    
+    print(index)
+
+
+def get_href(url, soup):
+    urls = []
+    for href in soup.find_all('a'):
+        abs_link = urljoin(url, href['href'])
+        # Only append links with the same netloc to the list
+        if urlsplit(url).netloc == urlsplit(abs_link).netloc:
+            urls.append(abs_link)
+    return urls
+
+
+def get_content(soup):
+    # Tokenize page content with nltk
+    tokens = nltk.word_tokenize(soup.get_text())
+    # Converts tokens to lower caseFilter tokens for stop words with nltk
+    filtered_tokens = [w.lower() for w in tokens if not w.lower() in stopwords.words('english')]
+    # Remove special characters
+    filtered_tokens = [word for word in filtered_tokens if word.isalnum()]
+    return filtered_tokens
+
+
+def update_index(url, index, content):
+    for word in content:
+        if word in index:
+            for k in index[word]:
+                # Var j is needed to not add multiple instances of a new url to the index
+                j = 0
+                if k['url'] == url:
+                    k['freq'] += 1
+                    j += 1
+            if j ==0: 
+                index[word].append({'url':url, 'freq':1})
+        else:
+            index[word] = [{'url':url, 'freq':1}]
+
+
+# %%
+if __name__ == "__main__":
+    crawl("https://vm009.rz.uos.de/crawl/index.html")
 # %%
