@@ -1,3 +1,5 @@
 /venv
 /Vorlesung
 /indexdir
+/.idea
+/__pycache__
