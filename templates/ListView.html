@@ -5,12 +5,15 @@
     <title>Results</title>
 </head>
 <body>
-    <h1> {{prompt}} </h1>
+    <h1> Your Results for: {{prompt}} </h1>
     <ul>
         {% for item in result %}
             <!--gets a dictionary of title and url and displays that in a list-->
             <li><a href={{ item['url'] }}> {{ item['title'] }} </a></li>
         {% endfor %}
     </ul>
+    <form>
+        <input type="button" value="Back to Search" onclick="history.back()">
+       </form>
 </body>
 </html>
