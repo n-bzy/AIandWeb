@@ -15,16 +15,20 @@ def create_index(index_dir: str):
 
 def add_content(index_dir: str, url, content):
     ix = open_dir(index_dir)
-    writer = ix.writer()
 
     # TODO: For x in content: add ...
     # for content in contents:
-    writer.add_document(url=url,
-                        title=content[0],
-                        content=content[1])
-
-    # write the index to the disk
-    writer.commit()
+    with ix.searcher() as searcher:
+        query = QueryParser("url", ix.schema).parse(url)
+        results = searcher.search(query)
+        # Loop over the stored fields in the index
+        if not results:
+            writer = ix.writer()
+            writer.add_document(url=url,
+                                title=content[0],
+                                content=content[1])
+            # write the index to the disk
+            writer.commit()
 
 
 def retrieve_content(index_dir: str, term):
