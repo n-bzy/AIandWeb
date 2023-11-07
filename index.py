@@ -33,14 +33,15 @@ def retrieve_content(index_dir: str, term):
         # find entries with the words 'first' AND 'last'
         query = QueryParser("content", ix.schema).parse(term)
         results = searcher.search(query)
-        # the search objects gets closed after the scope so you have to transfer the content beforehand
+        # the search objects gets closed after the scope so you have to
+        # transfer the content beforehand
         result_content = []
 
         # print all results
         for r in results:
-            print(r)
-            # creates a dictionary just like the search object with title and url
-            result_content.append({'title':r['title'], 'url':r['url']})
+            # creates a dictionary just like the search object
+            # with title and url
+            result_content.append({'title': r['title'], 'url': r['url']})
 
         return result_content
 
