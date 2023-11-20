@@ -9,7 +9,11 @@
     <ul>
         {% for item in result %}
             <!--gets a dictionary of title and url and displays that in a list-->
-            <li><a href={{ item['url'] }}> {{ item['title'] }} </a></li>
+            <li>
+                <a href={{ item['url'] }}> {{ item['title'] }} </a>
+                <p>{{ item['url']}}</p>
+                <p>{{ item['text'] | safe}}</p>
+            </li>
         {% endfor %}
     </ul>
     <form>

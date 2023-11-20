@@ -6,7 +6,9 @@ from whoosh.qparser import QueryParser
 
 def create_index(index_dir: str):
     # TODO: Add URL and freq
-    schema = Schema(url=ID(stored=True), title=TEXT(stored=True), content=TEXT)
+    schema = Schema(url=ID(stored=True),
+                    title=TEXT(stored=True),
+                    content=TEXT(stored=True))
 
     # Create an index in the directory indexdir
     # (the directory must already exist!)
@@ -31,6 +33,7 @@ def add_content(index_dir: str, url, content):
             writer.commit()
 
 
+# Add limit?
 def retrieve_content(index_dir: str, term):
     ix = open_dir(index_dir)
     with ix.searcher() as searcher:
@@ -42,10 +45,13 @@ def retrieve_content(index_dir: str, term):
         result_content = []
 
         # print all results
-        for r in results:
+        for hit in results:
+            highlight = hit.highlights("content")
             # creates a dictionary just like the search object
             # with title and url
-            result_content.append({'title': r['title'], 'url': r['url']})
+            result_content.append({'title': hit['title'],
+                                   'url': hit['url'],
+                                   'text': highlight})
 
         return result_content
 
