@@ -1,7 +1,8 @@
 # %%
+import re
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID
-from whoosh.qparser import QueryParser
+from whoosh.qparser import QueryParser, OrGroup
 
 
 def create_index(index_dir: str):
@@ -38,7 +39,9 @@ def retrieve_content(index_dir: str, term):
     ix = open_dir(index_dir)
     with ix.searcher() as searcher:
         # find entries with the words 'first' AND 'last'
-        query = QueryParser("content", ix.schema).parse(term)
+        term = re.sub(r"[^a-zA-Z0-9]+", ' ', term)
+        query = QueryParser("content", schema=ix.schema, group=OrGroup
+                            ).parse(term)
         results = searcher.search(query)
         # the search objects gets closed after the scope so you have to
         # transfer the content beforehand
