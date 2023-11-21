@@ -1,7 +1,43 @@
-/* Add your custom styles here */
-
 body {
+    font-family: Arial, sans-serif;
     background-color: #f8f9fa;
+}
+.search-results {
+    text-align: left;
+    margin: 5% auto;
+}
+.headline {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.search-form {
+    margin-bottom: 10px;
+}
+.result-list {
+    list-style-type: none;
+    padding: 0;
+}
+.result-item {
+    border: 1px solid #ddd;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+.result-item a {
+    color: blue;
+    font-size: 18px;
+    text-decoration: none;
+}
+.result-item p {
+    font-size: 14px;
+}
+.back-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+.back-button {
+    display: inline-block;
 }
 
 .container {
@@ -11,5 +47,3 @@ body {
 .input-group {
     width: 100%;
 }
-
-/* Add more styles as needed */
