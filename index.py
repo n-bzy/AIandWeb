@@ -6,7 +6,6 @@ from whoosh.qparser import QueryParser, OrGroup
 
 
 def create_index(index_dir: str):
-    # TODO: Add URL and freq
     schema = Schema(url=ID(stored=True),
                     title=TEXT(stored=True),
                     content=TEXT(stored=True))

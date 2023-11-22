@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def start():
+    crawler.crawl("https://vm009.rz.uos.de/crawl/index.html")
     return render_template("StartView.html")
 
 
@@ -17,7 +18,7 @@ def searchresults():
 
 
 if __name__ == "__main__":
-    crawler.crawl("https://vm009.rz.uos.de/crawl/index.html")
+    # crawler.crawl("https://vm009.rz.uos.de/crawl/index.html")
     # you have to run it as a regular python file and this starts
     # the app once the crawl is finished
     # Flask had some issues loading modules when started over the
