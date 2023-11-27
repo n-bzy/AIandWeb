@@ -42,6 +42,12 @@ def retrieve_content(index_dir: str, term):
         query = QueryParser("content", schema=ix.schema, group=OrGroup
                             ).parse(term)
         results = searcher.search(query)
+        corrected = searcher.correct_query(query, term)
+        if corrected.query != query:
+            # print("Did you mean:", corrected.string)
+            corr = corrected.string
+        else:
+            corr = None
         # the search objects gets closed after the scope so you have to
         # transfer the content beforehand
         result_content = []
@@ -55,7 +61,7 @@ def retrieve_content(index_dir: str, term):
                                    'url': hit['url'],
                                    'text': highlight})
 
-        return result_content
+        return result_content, corr
 
 
 # %%

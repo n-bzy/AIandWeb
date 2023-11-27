@@ -15,6 +15,12 @@
                     <input name="prompt" type="text" class="form-control" value="{{prompt}}" aria-label="Search" autofocus>
                     <button class="btn btn-primary" type="submit">Search</button>
                 </div>
+
+                {% if display_corr %}
+                    <div>
+                        <p>Did you mean: <a href="{{ url_for('searchresults', prompt=corr) }}"><em>{{corr}}</em></a></p>
+                    </div>
+                {% endif %}
             </form>
             <ul class="result-list">
                 {% for item in result %}

@@ -12,9 +12,18 @@ def start():
 
 @app.route("/search")
 def searchresults():
+    display_corr = False
     prompt = request.args.get('prompt')
-    result = crawler.search(prompt)
-    return render_template("ListView.html", prompt=prompt, result=result)
+    result, corr = crawler.search(prompt)
+    if not result:
+        display_corr = True
+    if not corr:
+        display_corr = False
+    return render_template("ListView.html",
+                           prompt=prompt,
+                           result=result,
+                           display_corr=display_corr,
+                           corr=corr)
 
 
 if __name__ == "__main__":

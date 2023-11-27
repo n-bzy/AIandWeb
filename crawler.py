@@ -72,8 +72,8 @@ def search(search_term):
     # sorted_output = sorted(output, key=lambda x: x['freq'], reverse=True)
     # output_url = [url['url'] for url in sorted_output]
     # return output_url
-    results = retrieve_content(index_dir="indexdir", term=search_term)
-    return results
+    results, corr = retrieve_content(index_dir="indexdir", term=search_term)
+    return results, corr
 
 
 # %%
