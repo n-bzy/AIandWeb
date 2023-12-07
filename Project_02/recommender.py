@@ -1,4 +1,5 @@
-# Contains parts from: https://flask-user.readthedocs.io/en/latest/quickstart_app.html
+# Contains parts from:
+# https://flask-user.readthedocs.io/en/latest/quickstart_app.html
 
 from flask import Flask, render_template
 from flask_user import login_required, UserManager
@@ -14,11 +15,14 @@ class ConfigClass(object):
     SECRET_KEY = 'This is an INSECURE secret!! DO NOT use this in production!!'
 
     # Flask-SQLAlchemy settings
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///movie_recommender.sqlite'  # File-based SQL database
-    SQLALCHEMY_TRACK_MODIFICATIONS = False  # Avoids SQLAlchemy warning
+    # File-based SQL database
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///movie_recommender.sqlite'
+    # Avoids SQLAlchemy warning
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Flask-User settings
-    USER_APP_NAME = "Movie Recommender"  # Shown in and email templates and page footers
+    # Shown in and email templates and page footers
+    USER_APP_NAME = "Movie Recommender"
     USER_ENABLE_EMAIL = False  # Disable email authentication
     USER_ENABLE_USERNAME = True  # Enable username authentication
     USER_REQUIRE_RETYPE_PASSWORD = True  # Simplify register form
@@ -48,7 +52,7 @@ def home_page():
     return render_template("home.html")
 
 
-# The Members page is only accessible to authenticated users 
+# The Members page is only accessible to authenticated users
 # via the @login_required decorator
 @app.route('/movies')
 @login_required  # User must be authenticated
@@ -59,7 +63,8 @@ def movies_page():
     movies = Movie.query.limit(10).all()
 
     # only Romance movies
-    # movies = Movie.query.filter(Movie.genres.any(MovieGenre.genre == 'Romance')).limit(10).all()
+    # movies = Movie.query.filter(Movie.genres.any(
+    #   MovieGenre.genre == 'Romance')).limit(10).all()
 
     # only Romance AND Horror movies
     # movies = Movie.query\
