@@ -12,6 +12,16 @@
                         <span class="label label-default">{{ g.genre }}</span>
                     {% endfor %}
                 </p>
+                <p>
+                    {% for l in m.links %}
+                    <a href="https://www.imdb.com/title/tt{{ l.imdb_id }}">
+                        <img src="https://m.media-amazon.com/images/G/01/IMDb/BG_rectangle._CB1509060989_SY230_SX307_AL_.png" width="50" height="25" alt="IMDb">
+                    </a>
+                    <a href="https://www.themoviedb.org/movie/{{ l.tmdb_id }}">
+                        <img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg" width="50" height="25" alt="TMDB">
+                    </a>                                      
+                    {% endfor %}
+                </p>
             </div>
               <div class="panel-footer">Rate:
                   <a href="#" class="card-link">1</a>

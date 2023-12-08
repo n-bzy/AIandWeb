@@ -39,6 +39,8 @@ class Movie(db.Model):
                       nullable=False,
                       unique=True)
     genres = db.relationship('MovieGenre', backref='movie', lazy=True)
+    links = db.relationship('MovieLinks', backref='movie', lazy=True)
+    tags = db.relationship('MovieTags', backref='movie', lazy=True)
 
 
 class MovieGenre(db.Model):
@@ -66,5 +68,5 @@ class MovieLinks(db.Model):
                          db.ForeignKey('movies.id'),
                          nullable=False,
                          primary_key=True)
-    imdb_id = db.Column(db.Integer)
-    tmdb_id = db.Column(db.Integer)
+    imdb_id = db.Column(db.String(255))
+    tmdb_id = db.Column(db.String(255))

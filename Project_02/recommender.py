@@ -3,7 +3,7 @@
 
 from flask import Flask, render_template
 from flask_user import login_required, UserManager
-from models import db, User, Movie, MovieGenre
+from models import db, User, Movie, MovieLinks
 from read_data import check_and_read_data
 
 
@@ -58,7 +58,7 @@ def home_page():
 @login_required  # User must be authenticated
 def movies_page():
     # String-based templates
-
+    # links = []
     # first 10 movies
     movies = Movie.query.limit(10).all()
 
