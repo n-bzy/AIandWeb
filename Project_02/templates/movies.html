@@ -1,9 +1,39 @@
 {% extends "flask_user_layout.html" %}
 {% block content %}
-<div class="container">
-    <h2>Movies</h2>
 
+<div class="container mt-3">
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseContainer" aria-expanded="false" aria-controls="collapseContainer">
+        Preferences
+    </button>
+    <div class="collapse" id="collapseContainer">
+        <div class="card card-body">
+            <h3>Choose a minimum of 3 Genres</h3>
+            <form id="selectionForm" method="post" action="{{ url_for('movies_page') }}" onsubmit="return validateForm()">
+                <div class="row">
+                    {% for g in genres %}
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="entry{{loop.index}}">
+                                <input type="checkbox" id="entry{{loop.index}}" name="selectedEntries" value="{{g}}" {% if g in selected_entries %}checked{% endif %}>
+                                {{g}}
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-success">Submit Selected Entries</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <h2>Your best Movie Recommendations:</h2>
+    {% set count = 0 %}
     {% for m in movies %}
+        {% set count = count + 1 %}
         <div class="panel panel-default">
             <div class="panel-heading"><b>{{ m.title }}</b></div>
             <div class="panel-body">
@@ -22,16 +52,79 @@
                     </a>                                      
                     {% endfor %}
                 </p>
+                <p>
+                    Rating: 
+                    <span class="star-rating">
+                        ★ {{ ratings[m][0] }} {{ratings[m][1]}}
+                    </span>
+                </p>
             </div>
-              <div class="panel-footer">Rate:
-                  <a href="#" class="card-link">1</a>
-                  <a href="#" class="card-link">2</a>
-                  <a href="#" class="card-link">3</a>
-                  <a href="#" class="card-link">4</a>
-                  <a href="#" class="card-link">5</a> Stars
+              <div class="panel-footer movie-rating">Rate:
+                  <a href="#" class="card-link" data-movieid="{{m.id}}">1</a>
+                  <a href="#" class="card-link" data-movieid="{{m.id}}">2</a>
+                  <a href="#" class="card-link" data-movieid="{{m.id}}">3</a>
+                  <a href="#" class="card-link" data-movieid="{{m.id}}">4</a>
+                  <a href="#" class="card-link" data-movieid="{{m.id}}">5</a> Stars
               </div>
         </div>
     {% endfor %}
 </div>
+
+
+<script>
+    // Function to handle the click event on any rating link
+    function rateMovie(event) {
+        event.preventDefault(); // Prevent the default anchor action
+
+        var movieid = this.getAttribute('data-movieid');
+        var rating = this.textContent;
+        var elem = this;
+
+        // Create an AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/rate', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        // Handle the response
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Replace the entire div with the response
+                elem.parentElement.innerHTML = xhr.responseText;
+            } else {
+                alert('Request failed. Returned status of ' + xhr.status);
+            }
+        };
+
+        // Send the request with the movie ID and the rating
+        xhr.send('movieid=' + movieid + '&rating=' + rating);
+    }
+
+    // Attach the event listener to each rating link
+    var links = document.querySelectorAll('.movie-rating .card-link');
+    for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener('click', rateMovie);
+    }
+</script>
+
+<script>
+    // Check if at least 3 Genres were selected
+    function validateForm() {
+        var checkboxes = document.getElementsByName('selectedEntries');
+        var checkedCount = 0;
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                checkedCount++;
+            }
+        }
+
+        if (checkedCount < 3) {
+            alert("Please select a minimum of 3 Genres");
+            return false; // Prevent form submission
+        }
+
+        return true; // Allow form submission
+    }
+</script>
 
 {% endblock %}

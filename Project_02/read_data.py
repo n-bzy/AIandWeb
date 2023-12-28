@@ -1,6 +1,6 @@
 import csv
 from sqlalchemy.exc import IntegrityError
-from models import Movie, MovieGenre, MovieLinks, MovieTags
+from models import Movie, MovieGenre, MovieLinks, MovieTags, MovieRatings, User
 from datetime import datetime
 
 
@@ -50,6 +50,7 @@ def check_and_read_data(db):
                         db.session.commit()
                     except IntegrityError:
                         # print("Ignoring duplicate links: " + movie_id)
+                        print("rollback link"+str(count))
                         db.session.rollback()
                         pass
                 count += 1
@@ -66,16 +67,61 @@ def check_and_read_data(db):
                         movie_id = row[1]
                         tag = row[2]
                         timestamp = datetime.fromtimestamp(int(row[3]))
-                        links = MovieTags(user_id=user_id,
-                                          movie_id=movie_id,
-                                          tag=tag,
-                                          timestamp=timestamp)
-                        db.session.add(links)
+                        tags = MovieTags(user_id=user_id,
+                                         movie_id=movie_id,
+                                         tag=tag,
+                                         timestamp=timestamp)
+                        db.session.add(tags)
                         db.session.commit()
                     except IntegrityError:
-                        # print("Ignoring duplicate tags: " + title)
+                        print("rollback tag"+str(count))
                         db.session.rollback()
                         pass
                 count += 1
                 if count % 100 == 0:
                     print(count, " tags read")
+
+        with open('data/ratings.csv', newline='', encoding='utf8') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            count = 0
+            for row in reader:
+                if count > 0:
+                    try:
+                        user_id = row[0]
+                        movie_id = row[1]
+                        rating = row[2]
+                        timestamp = datetime.fromtimestamp(int(row[3]))
+                        ratings = MovieRatings(user_id=user_id,
+                                               movie_id=movie_id,
+                                               rating=rating,
+                                               timestamp=timestamp)
+                        db.session.add(ratings)
+                        db.session.commit()
+                    except IntegrityError:
+                        print("rollback rating"+str(count))
+                        db.session.rollback()
+                        pass
+                count += 1
+                if count % 100 == 0:
+                    print(count, "ratings read")
+
+        with open('data/ratings.csv', newline='', encoding='utf8') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            count = 0
+            for row in reader:
+                if count > 0:
+                    try:
+                        user_id = row[0]
+                        user = User(id=user_id,
+                                    active=1,
+                                    username="a"+str(count),
+                                    password="Qwert"+str(count))
+                        db.session.add(user)
+                        db.session.commit()
+                    except IntegrityError:
+                        print("rollback user"+str(count))
+                        db.session.rollback()
+                        pass
+                count += 1
+                if count % 100 == 0:
+                    print(count, "users read")
