@@ -33,6 +33,10 @@ class ConfigClass(object):
     USER_AFTER_LOGIN_ENDPOINT = 'home_page'
     USER_AFTER_LOGOUT_ENDPOINT = 'home_page'
     USER_AFTER_REGISTER_ENDPOINT = 'home_page'
+    USER_AFTER_REGISTER_ENDPOINT = 'home_page'
+    USER_AFTER_CONFIRM_ENDPOINT = 'home_page'
+    USER_AFTER_LOGIN_ENDPOINT = 'home_page'
+    USER_AFTER_LOGOUT_ENDPOINT = 'home_page'
 
 
 # Create Flask app
@@ -94,7 +98,7 @@ def rate():
     movieid = request.form.get('movieid')
     rating = request.form.get('rating')
     userid = current_user.id
-    print("Rate {} for {} by {}".format(rating, movieid, userid))
+    # print("Rate {} for {} by {}".format(rating, movieid, userid))
     try:
         ratings = MovieRatings(user_id=userid,
                                movie_id=movieid,
@@ -102,7 +106,7 @@ def rate():
         db.session.add(ratings)
         db.session.commit()
     except IntegrityError:
-        print("rollback rating")
+        # print("rollback rating")
         db.session.rollback()
         pass
     return render_template("rated.html", rating=rating)
@@ -165,7 +169,7 @@ def find_k_nearest_neighbors(user_id, k=5):
 
     # Get the top k neighbors
     top_k_neighbors = sorted_neighbors[:k]
-    print(top_k_neighbors)
+    # print(top_k_neighbors)
 
     # Retrieve movie ratings for the top k neighbors
     neighbors_ratings = []
