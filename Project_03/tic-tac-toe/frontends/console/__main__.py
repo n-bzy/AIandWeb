@@ -1,3 +1,6 @@
-from .cli import main
+# from .cli import main
+# main()
 
-main()
+from .channel2 import run
+
+run()

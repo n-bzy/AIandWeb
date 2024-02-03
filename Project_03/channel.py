@@ -90,6 +90,7 @@ def send_message():
         return "No timestamp", 400
     # add message to messages
     messages = read_messages()
+    # print(messages)
     messages.append({'content': message['content'],
                      'sender': message['sender'],
                      'timestamp': message['timestamp']})

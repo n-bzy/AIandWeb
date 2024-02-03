@@ -7,14 +7,8 @@ from tic_tac_toe.logic.models import GameState
 
 class ConsoleRenderer(Renderer):
     def render(self, game_state: GameState) -> None:
-        # clear_screen()
-        if game_state.winner:
-            print_blinking(game_state.grid.cells, game_state.winning_cells)
-            print(f"{game_state.winner} wins")
-        else:
-            print_solid(game_state.grid.cells)
-            if game_state.tie:
-                print("No one wins this time")
+        grid = print_solid(game_state.grid.cells)
+        return grid
 
 
 def clear_screen() -> None:
@@ -33,8 +27,7 @@ def print_blinking(cells: Iterable[str], positions: Iterable[int]) -> None:
 
 
 def print_solid(cells: Iterable[str]) -> None:
-    print(
-        textwrap.dedent(
+    k = textwrap.dedent(
             """\
              A   B   C
            ------------
@@ -45,4 +38,5 @@ def print_solid(cells: Iterable[str]) -> None:
         3 ┆  {6} │ {7} │ {8}
     """
         ).format(*cells)
-    )
+    # print(k)
+    return k
