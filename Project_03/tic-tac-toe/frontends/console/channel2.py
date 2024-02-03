@@ -1,9 +1,10 @@
 # tic-tac-toe channel
 from flask import Flask, request, jsonify  # render_template
 from .cli import main
-from .args import parse_args
+from .args import parse_args, grid_to_index
 from tic_tac_toe.logic.models import GameState, Grid, Mark
-from .renderers import ConsoleRenderer
+# from tic_tac_toe.logic.exceptions import InvalidMove
+from .renderers import ConsoleRenderer, print_solid
 import json
 import requests
 
@@ -29,9 +30,12 @@ CHANNEL_ENDPOINT = "http://localhost:5002"
 CHANNEL_FILE = 'messages2.json'
 p1 = None
 p2 = None
+gs = None
+EMPTY_GRID = print_solid("         ")
 
 
 def run():
+    save_messages([])
     app.run(port=5002, debug=True)
 
 
@@ -82,7 +86,7 @@ def home_page():
 # POST: Send a message
 @app.route('/', methods=['POST'])
 def send_message():
-    global p1, p2
+    global p1, p2, gs
     # fetch channels from server
     # check authorization header
     if not check_authorization(request):
@@ -99,26 +103,28 @@ def send_message():
         return "No timestamp", 400
     # add message to messages
     inpt = message['content']
+    # print(gs)
     messages = read_messages()
-    print(messages)
+    # print(messages)
     if not messages:
         p1, p2, gs, grid = start_ttt()
     else:
-        if messages[-1]['gs']['game_over']:
+        if gs.game_over:
+            save_messages([])
             p1, p2, gs, grid = start_ttt()
-        else:
-            # p1 = messages[-1]['p1']
-            # p2 = messages[-1]['p2']
-            gs = messages[-1]['gs']
-    p1, p2, gs, grid = play_ttt(p1, p2, gs, inpt)
-    print(grid)
+    if check_inpt(inpt, messages):
+        return "OK", 200
+
+    grid = play_ttt(inpt)
+    # print(grid)
     messages.append({'sender': message['sender'],
-                     # 'p1': p1,
-                     # 'p2': p2,
-                     'gs': gs,
-                     # Content = grid
                      'content': grid,
-                     'timestamp': message['timestamp']})
+                     })
+    if not gs.game_over:
+        grid = bot_response()
+        messages.append({'sender': 'ttt_bot',
+                        'content': grid,
+                         })
     save_messages(messages)
     return "OK", 200
 
@@ -140,7 +146,41 @@ def read_messages():
 def save_messages(messages):
     global CHANNEL_FILE
     with open(CHANNEL_FILE, 'w') as f:
-        json.dump(messages, f, default=lambda o: o.__dict__)
+        json.dump(messages, f)  # , default=lambda o: o.__dict__)
+
+
+def check_inpt(inpt, messages):
+    try:
+        grid_to_index(inpt)
+    except ValueError:
+        messages.append({'sender': 'ttt_bot',
+                        'content': "Please provide coordinates in the form of A1 or 1A",
+                         })
+        save_messages(messages)
+        return True
+    if gs.grid.cells[grid_to_index(inpt)] != " ":
+        # raise InvalidMove("Cell is not empty")
+        messages.append({'sender': 'ttt_bot',
+                        'content': f'Cell {inpt} is not empty, select an empty cell!',
+                         })
+        save_messages(messages)
+        return True
+
+
+def bot_response():
+    global p1, p2, gs
+    inpt = None
+    gs = main(p1, p2, gs, inpt)
+    grid = ConsoleRenderer().render(game_state=gs)
+    if gs.game_over:
+        # grid = ConsoleRenderer().render(game_state=gs)
+        if gs.winner:
+            st = f"\n {gs.winner} wins"
+            return str(grid+st)
+        if gs.tie:
+            st = "\n No one wins this time"
+            return str(grid+st)
+    return grid
 
 
 def start_ttt():
@@ -152,20 +192,23 @@ def start_ttt():
     return p1, p2, gs, grid
 
 
-def play_ttt(p1, p2, gs, inpt):
-    grid = ConsoleRenderer().render(game_state=gs)
-    # print(grid)
+def play_ttt(inpt):
+    global p1, p2, gs
+    # print(p1, p2, gs, inpt)
     gs = main(p1, p2, gs, inpt)
+    grid = ConsoleRenderer().render(game_state=gs)
     if gs.game_over:
-        grid = ConsoleRenderer().render(game_state=gs)
-        # print(grid)
+        # grid = ConsoleRenderer().render(game_state=gs)
         if gs.winner:
-            print(f"{gs.winner} wins")
+            st = f"\n {gs.winner} wins"
+            return str(grid+st)
         if gs.tie:
-            print("No one wins this time")
-    return p1, p2, gs, grid
+            st = "\n No one wins this time"
+            return str(grid+st)
+    return grid
 
 
 # Start development web server
 if __name__ == '__main__':
+    save_messages([])
     app.run(port=5002, debug=True)

@@ -1,14 +1,17 @@
 import argparse
 from typing import NamedTuple
 import re
+import abc
+import time
 
 from tic_tac_toe.game.players import (
     Player,
     RandomComputerPlayer,
-    MinimaxComputerPlayer,
+    # MinimaxComputerPlayer,
 )
 from tic_tac_toe.logic.models import Mark, GameState, Move
 from tic_tac_toe.logic.exceptions import InvalidMove
+from tic_tac_toe.logic.minimax import find_best_move
 
 # from players import ConsolePlayer
 # from .cli import NewConsolePlayer
@@ -48,10 +51,40 @@ def grid_to_index(grid: str) -> int:
     return 3 * (int(row) - 1) + (ord(col.upper()) - ord("A"))
 
 
+class NewComputerPlayer(Player, metaclass=abc.ABCMeta):
+    def __init__(self, mark: Mark, delay_seconds: float = 0.25) -> None:
+        super().__init__(mark)
+        self.delay_seconds = delay_seconds
+
+    def get_move(self, game_state: GameState) -> Move | None:
+        time.sleep(self.delay_seconds)
+        return self.get_computer_move(game_state)
+
+    def make_move(self, inpt, game_state: GameState) -> GameState:
+        if self.mark is game_state.current_mark:
+            if move := self.get_move(game_state):
+                return move.after_state
+            raise InvalidMove("No more possible moves")
+        else:
+            raise InvalidMove("It's the other player's turn")
+
+    @abc.abstractmethod
+    def get_computer_move(self, game_state: GameState) -> Move | None:
+        """Return the computer's move in the given game state."""
+
+
+class NewMinimaxComputerPlayer(NewComputerPlayer):
+    def get_computer_move(self, game_state: GameState) -> Move | None:
+        if game_state.game_not_started:
+            return game_state.make_random_move()
+        else:
+            return find_best_move(game_state)
+
+
 PLAYER_CLASSES = {
     "human": NewConsolePlayer,
     "random": RandomComputerPlayer,
-    "minimax": MinimaxComputerPlayer,
+    "minimax": NewMinimaxComputerPlayer,
 }
 
 
