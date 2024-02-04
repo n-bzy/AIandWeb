@@ -103,9 +103,7 @@ def send_message():
         return "No timestamp", 400
     # add message to messages
     inpt = message['content']
-    # print(gs)
     messages = read_messages()
-    # print(messages)
     if not messages:
         p1, p2, gs, grid = start_ttt()
     else:
@@ -114,9 +112,7 @@ def send_message():
             p1, p2, gs, grid = start_ttt()
     if check_inpt(inpt, messages):
         return "OK", 200
-
     grid = play_ttt(inpt)
-    # print(grid)
     messages.append({'sender': message['sender'],
                      'content': grid,
                      })
@@ -146,7 +142,7 @@ def read_messages():
 def save_messages(messages):
     global CHANNEL_FILE
     with open(CHANNEL_FILE, 'w') as f:
-        json.dump(messages, f)  # , default=lambda o: o.__dict__)
+        json.dump(messages, f)
 
 
 def check_inpt(inpt, messages):
@@ -173,7 +169,6 @@ def bot_response():
     gs = main(p1, p2, gs, inpt)
     grid = ConsoleRenderer().render(game_state=gs)
     if gs.game_over:
-        # grid = ConsoleRenderer().render(game_state=gs)
         if gs.winner:
             st = f"\n {gs.winner} wins"
             return str(grid+st)
@@ -198,7 +193,6 @@ def play_ttt(inpt):
     gs = main(p1, p2, gs, inpt)
     grid = ConsoleRenderer().render(game_state=gs)
     if gs.game_over:
-        # grid = ConsoleRenderer().render(game_state=gs)
         if gs.winner:
             st = f"\n {gs.winner} wins"
             return str(grid+st)
